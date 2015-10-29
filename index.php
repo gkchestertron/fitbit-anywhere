@@ -1,6 +1,6 @@
 <?php 
 require 'util.php';
-$url = OAUTH_HREF . '?client_id=' . CLIENT_ID . '&response_type=' . RESPONSE_TYPE . '&scope=' . SCOPE . '&redirect_uri=' . REDIRECT_URI;
+$url = FITBIT_OAUTH_HREF . '?client_id=' . FITBIT_CLIENT_ID . '&response_type=' . FITBIT_RESPONSE_TYPE . '&scope=' . FITBIT_SCOPE . '&redirect_uri=' . FITBIT_REDIRECT_URI;
 $code = $_GET['code'];
 $fitbit = new FitBitConnection();
 if (isset($code)) {

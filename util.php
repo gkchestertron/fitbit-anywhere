@@ -1,13 +1,6 @@
 <?php
 require('config.php');
 session_start();
-if (isset($_SESSION['count'])) {
-    $_SESSION['count']++;
-}
-else {
-    $_SESSION['count'] = 0;
-}
-
 class FitBitConnection {
     function __construct() {
         if (isset($_SESSION['oauth_json']) && isset($_SESSION['auth_header'])) {
@@ -61,11 +54,11 @@ class FitBitConnection {
     function get_oauth_tokens($code) {
         $auth_header   = array("Authorization: Basic " . base64_encode(CLIENT_ID . ":" . CLIENT_SECRET));
 
-        $token_request_href = OAUTH_TOKEN_HREF . 
+        $token_request_href = FITBIT_OAUTH_TOKEN_HREF . 
             '?code=' . $code . 
-            '&grant_type='   . GRANT_TYPE . 
-            '&client_id='    . CLIENT_ID . 
-            '&redirect_uri=' . REDIRECT_URI;
+            '&grant_type='   . FITBIT_GRANT_TYPE . 
+            '&client_id='    . FITBIT_CLIENT_ID . 
+            '&redirect_uri=' . FITBIT_REDIRECT_URI;
 
         $json = $this->do_post_request($token_request_href, null, $auth_header);
 
@@ -77,7 +70,7 @@ class FitBitConnection {
     }
 
     function get_user_data($data_path, $date) {
-        $url = API_URL . $this->oauth->user_id . '/' . $data_path . '/date/' . $date . '.json';
+        $url = FITBIT_API_URL . $this->oauth->user_id . '/' . $data_path . '/date/' . $date . '.json';
         return $this->do_get_request($url, array($_SESSION['auth_header']));
     }
 }
