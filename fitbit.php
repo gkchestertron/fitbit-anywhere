@@ -21,7 +21,10 @@ class FitBitConnection {
         return '<div>' . $html . '</div>';
     }
 
-    function buildHtmlHelper($data, $html) {
+    function buildHtmlHelper($data, $html, ) {
+        if (!isset($data)) {
+            return '';
+        }
         foreach ($data as $key => $val) {
             if (gettype($val) == 'object' || gettype($val) == 'array') {
                 $html .= '<div style="margin-left: 20px"><h2>' . $key . '</h2>' . $this->buildHtmlHelper($val, '') . '</div>';
@@ -29,7 +32,6 @@ class FitBitConnection {
             else {
                 $html .= '<p>' . $key . ': ' . $val . '</p>';
             }
-
         }
 
         return $html;
@@ -106,9 +108,8 @@ class FitBitConnection {
         }
 
         list($json, $status) = $this->do_get_request($url, array($this->auth_header));
-
         if ($status == 401 && isset($this->oauth->refresh_token)) {
-            $this->refreshToken();
+            $this->refresh_access_token();
             list($json, $status) = $this->do_get_request($url, array($this->auth_header));
         }
 
@@ -116,7 +117,6 @@ class FitBitConnection {
     }
 
     function refresh_access_token() {
-        echo('refreshing access_token');
         $auth_header   = array("Authorization: Basic " . base64_encode(FITBIT_CLIENT_ID . ":" . FITBIT_CLIENT_SECRET));
         $refresh_token_request_href = FITBIT_OAUTH_TOKEN_HREF . 
             '?grant_type='   . FITBIT_REFRESH_GRANT_TYPE .
