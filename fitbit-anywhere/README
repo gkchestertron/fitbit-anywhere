@@ -1,0 +1,5 @@
+This plugin adds connecting to the fitbit via oauth, getting user data through a [fitbit_api feature="" key=""] shortcode and provides the link for connecting to fitbit via the [fitbit_auth_link] shortcode.
+
+The fitbit_api shortcode takes two parameters:
+1. the feature parameter - i.e. activities
+2. the key parameter - a space separated list of keys within the json object returned by the api. As in - if the response were { goals: { distance-goals: [] } }, to get the key parameter would need to be key="goals distance-goals".

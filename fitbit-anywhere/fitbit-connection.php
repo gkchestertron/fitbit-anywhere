@@ -1,44 +1,16 @@
 <?php
-require 'config.php';
+require 'fitbit-config.php';
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-date_default_timezone_set('America/Los_Angeles');
-
-class FitBitConnection {
-    function __construct() {
+class FitbitConnection {
+    function init() {
         if (isset($_SESSION['oauth_json']) && isset($_SESSION['auth_header'])) {
             $this->oauth = json_decode($_SESSION['oauth_json']);
             $this->auth_header = $_SESSION['auth_header'];
         }
     }
 
-    function buildHtml($data) {
-        $html = $this->buildHtmlHelper($data, '');
-
-        return '<div>' . $html . '</div>';
-    }
-
-    function buildHtmlHelper($data, $html, ) {
-        if (!isset($data)) {
-            return '';
-        }
-        foreach ($data as $key => $val) {
-            if (gettype($val) == 'object' || gettype($val) == 'array') {
-                $html .= '<div style="margin-left: 20px"><h2>' . $key . '</h2>' . $this->buildHtmlHelper($val, '') . '</div>';
-            }
-            else {
-                $html .= '<p>' . $key . ': ' . $val . '</p>';
-            }
-        }
-
-        return $html;
-    }
-
     function do_get_request($url, $optional_headers = null) {
-        $headers = array("Content-Type: application/x-www-form-urlencoded");
+        $headers = array("Content-Type: application/x-www-form-urlencoded", "Accept-Language: en_US");
         $request = curl_init();
 
         curl_setopt($request, CURLOPT_URL,$url);
@@ -99,9 +71,12 @@ class FitBitConnection {
         $_SESSION['oauth_json'] = $json;
     }
 
-    function get_user_data($data_path, $date = null) {
+    function get_user_data($data_path, $date = null, $period = null) {
         if (!isset($date)) {
             $url = FITBIT_API_URL . $this->oauth->user_id . '/' . $data_path . '.json';
+        }
+        else if (isset($date) && isset($period)) {
+            $url = FITBIT_API_URL . $this->oauth->user_id . '/' . $data_path . '/date/' . $date . '/' . $period .'.json';
         }
         else {
             $url = FITBIT_API_URL . $this->oauth->user_id . '/' . $data_path . '/date/' . $date . '.json';
@@ -113,7 +88,28 @@ class FitBitConnection {
             list($json, $status) = $this->do_get_request($url, array($this->auth_header));
         }
 
-        return array($json, $status);
+        $this->{$data_path} = array("json" => $json, "status" => $status, "data" => json_decode($json));
+    }
+
+    function get_top_level_data($data_path, $query = null) {
+        $url = FITBIT_TOP_LEVEL_URL . $data_path . '.json';
+            
+        if (isset($query)) {
+            $url .= '?query=' . $query;
+        }
+
+        list($json, $status) = $this->do_get_request($url, array($this->auth_header));
+
+        if ($status == 401 && isset($this->oauth->refresh_token)) {
+            $this->refresh_access_token();
+            list($json, $status) = $this->do_get_request($url, array($this->auth_header));
+        }
+
+        if (!isset($this->top_level)) {
+            $this->top_level = new stdClass();
+        }
+
+        $this->top_level->{$data_path} = array("json" => $json, "status" => $status, "data" => json_decode($json));
     }
 
     function refresh_access_token() {

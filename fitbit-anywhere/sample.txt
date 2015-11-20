@@ -1,0 +1,98 @@
+<strong>Loading Data</strong>
+
+must first be loaded with the fitbit_load shortcode, which needs to have a "feature" parameter.
+
+[fitbit_load feature="badges"]
+[fitbit_load feature="activities" date="today"]
+[fitbit_load feature="foods/log" date="today"]
+[fitbit_load feature="body/log/fat" date="today" period="1m"]
+[fitbit_load feature="body/log/weight" date="today" period="1m"]
+
+<strong>The Login Link</strong>
+Logging into fitbit is handled by the fitbit_auth_link shortcode. It needs no parameters and will figure out whether the user has already allowed your app access to their fitbit data.
+
+[fitbit_auth_link]
+
+<strong>Displaying the Data</strong>
+
+The fitbit_api shortcode allows us to display the data. It takes two parameters: "feature" and "key". The feature parameter tells it which data you are interested in (activities, badges, foods/log, etc...). The key parameter tells it what piece you want to display. For example: Badges has a list of badges (redundantly named "badges"). So to get the badges you use the fitbit_api shortcode with the parameters feature="badges" key="badges".  
+
+Inside opening/closing fitbit_api shortcode tags, you can use the fitbit_data shortcode which allows you to pick out and style individual pieces of data. At any level, if you just want to see the raw data, just set key="json" on the shortcode, and it will print it out. If you want a cleaner way to view it, copy the output and paste it into <a href="http://jsonviewer.stack.hu/">online json viewer</a> - happy api-ing!
+
+Additional notes: 
+
+fitbit_api shortcode tags must always be closed with a matching /fitbit_api tag even if there is no content in between. 
+
+The fitbit_load shortcode can also take a date parameter, which should be set to "today" to get today's data. It can also take a period parameter which can be set to any of the following: 1d, 7d, 30d, 1w, 1m, 3m, 6m, 1y, or max. Except on fat and weight, where the max period is 1m.
+
+<strong>Activities</strong>
+[fitbit_api feature="activities" key="activities"]
+<strong>[fitbit_data key="name"]</strong>
+<ul>
+<li>Calories: [fitbit_data key="calories"]</li>
+<li>Description: [fitbit_data key="description"]</li>
+<li>Distance: [fitbit_data key="distance"]</li>
+<li>Duration: [fitbit_data key="duration"]</li>
+<li>Steps: [fitbit_data key="steps"]</li>
+</ul>
+[/fitbit_api]
+<strong>Activities - Goals:</strong>
+Nested data can be accessed by listing the keys in the path separated by spaces.
+<ul>
+<li>Active Minutes: [fitbit_api feature="activities" key="goals activeMinutes"][/fitbit_api]</li>
+<li>Calories Out: [fitbit_api feature="activities" key="goals caloriesOut"][/fitbit_api]</li>
+<li>Distance: [fitbit_api feature="activities" key="goals distance"][/fitbit_api]</li>
+<li>Floors: [fitbit_api feature="activities" key="goals floors"][/fitbit_api]</li>
+<li>Steps: [fitbit_api feature="activities" key="goals steps"][/fitbit_api]</li>
+</ul>
+
+<strong>Activities - Summary:</strong>
+<ul>
+<li>Activity Calories: [fitbit_api feature="activities" key="summary activityCalories"][/fitbit_api]</li>
+<li>Calories BMR: [fitbit_api feature="activities" key="summary caloriesBMR"][/fitbit_api]</li>
+<li>Calories Out: [fitbit_api feature="activities" key="summary caloriesOut"][/fitbit_api]</li>
+<li>Elevation: [fitbit_api feature="activities" key="summary elevation"][/fitbit_api]</li>
+<li>Fairly Active Minutes: [fitbit_api feature="activities" key="summary fairlyActiveMinutes"][/fitbit_api]</li>
+<li>Floors: [fitbit_api feature="activities" key="summary floors"][/fitbit_api]</li>
+<li>Lightly Active Minutes: [fitbit_api feature="activities" key="summary lightlyActiveMinutes"][/fitbit_api]</li>
+<li>Marginal Calories: [fitbit_api feature="activities" key="summary marginalCalories"][/fitbit_api]</li>
+<li>Sedentary Minutes: [fitbit_api feature="activities" key="summary sedentaryMinutes"][/fitbit_api]</li>
+<li>Steps: [fitbit_api feature="activities" key="summary steps"][/fitbit_api]</li>
+<li>Very Active Minutes: [fitbit_api feature="activities" key="summary veryActiveMinutes"][/fitbit_api]</li>
+</ul>
+
+<strong>Activities - Summary - Distances:</strong>
+The plugin also allows iteration if the data is an array (list).
+[fitbit_api feature="activities" key="summary distances"]
+<ul>
+<li>[fitbit_data key="activity"]: [fitbit_data key="distance"]</li>
+</ul>
+[/fitbit_api]
+
+<strong>Badges</strong>
+[fitbit_api feature="badges" key="badges"]
+<img src="[fitbit_data key="image100px"]" />
+<strong>[fitbit_data key="shortName"]</strong>
+[fitbit_data key="shortDescription"]
+Times Achieved: [fitbit_data key="timesAchieved"]
+[/fitbit_api]
+
+<strong>Fat Log</strong>
+[fitbit_api feature="body/log/fat" key="fat"]
+    <strong>[fitbit_data key="date"]</strong>
+    <ul>
+    <li>Fat: [fitbit_data key="fat"]</li>
+    <li>Time [fitbit_data key="time"]</li>
+    </ul>
+[/fitbit_api]
+
+
+<strong>Weight Log</strong>
+[fitbit_api feature="body/log/weight" key="weight"]
+    <strong>[fitbit_data key="date"]</strong>
+    <ul>
+    <li>BMI: [fitbit_data key="bmi"]</li>
+    <li>Time: [fitbit_data key="time"]</li>
+    <li>Weight: [fitbit_data key="weight"]</li>
+    </ul>
+[/fitbit_api]
